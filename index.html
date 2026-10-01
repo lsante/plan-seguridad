@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mi plan de seguridad</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EAF1EF; --surface:#FFFFFF; --ink:#1D2A36; --muted:#55687A;
+  --sea:#2B7471; --sea-soft:#D3E6E2; --line:#C5D6D2;
+  --alert:#B3372A; --alert-soft:#F7E2DE; --wa:#1C8A4E; --sun:#D99A2B;
+  --body:'Atkinson Hyperlegible', 'Segoe UI', Roboto, Arial, sans-serif;
+  --head:'Bricolage Grotesque', 'Atkinson Hyperlegible', 'Segoe UI', Arial, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#12202A; --surface:#1A2C38; --ink:#E5EEF0; --muted:#9EB2BD;
+    --sea:#5FB1AC; --sea-soft:#21403F; --line:#2D4552;
+    --alert:#E26B5D; --alert-soft:#3A2420; --wa:#3BB872; --sun:#E8B455;
+  }
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.5;-webkit-text-size-adjust:100%}
+main{max-width:560px;margin:0 auto;padding:20px 18px 120px}
+h1,h2{font-family:var(--head);line-height:1.15;margin:0}
+h1{font-size:2.1rem;letter-spacing:-.01em}
+h2{font-size:1.6rem;margin-top:6px}
+p{margin:.5em 0}
+.muted{color:var(--muted)}
+.small{font-size:.92rem}
+button,a.btn{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+
+/* Botones */
+.btn{display:flex;align-items:center;justify-content:center;gap:.5em;width:100%;min-height:54px;padding:12px 18px;border-radius:14px;border:2px solid var(--sea);background:transparent;color:var(--sea);font-weight:700;text-decoration:none;text-align:center}
+.btn.primary{background:var(--sea);color:var(--surface)}
+.btn.alert{background:var(--alert);border-color:var(--alert);color:#fff}
+.btn.alert-line{background:var(--surface);border-color:var(--alert);color:var(--alert)}
+.sep{border:none;border-top:1.5px solid var(--alert);opacity:.25;margin:16px 0}
+.btn.wa{background:var(--wa);border-color:var(--wa);color:#fff}
+.btn.quiet{border-color:var(--line);color:var(--ink)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.stack{display:grid;gap:12px}
+.mini{display:inline-flex;align-items:center;min-height:40px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--sea);color:var(--sea);background:transparent;font-weight:700;font-size:.92rem;text-decoration:none}
+.mini.wa{border-color:var(--wa);color:var(--wa)}
+.mini.alert{border-color:var(--alert);color:var(--alert)}
+
+/* Inicio */
+.hero{padding:18px 0 8px}
+.hero p{font-size:1.1rem;color:var(--muted);max-width:30ch}
+.sos-card{background:var(--alert-soft);border-radius:18px;padding:16px;margin:18px 0 26px}
+.sos-card p{margin:0 0 10px}
+.sos-card .small{margin:10px 0 0}
+.saved{margin-top:4px;text-align:center}
+.foot{margin-top:28px;text-align:center}
+
+/* Barra superior y ola */
+.bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.bar button{background:none;border:none;color:var(--sea);font-weight:700;padding:8px 0;min-height:44px}
+.wave{display:block;width:100%;height:auto;margin:4px 0 10px}
+.wave .track{fill:none;stroke:var(--line);stroke-width:3;stroke-linecap:round}
+.wave .done{fill:none;stroke:var(--sea);stroke-width:3;stroke-linecap:round}
+.wave circle{fill:var(--surface);stroke:var(--line);stroke-width:2.5}
+.wave circle.past{fill:var(--sea);stroke:var(--sea)}
+.wave circle.now{fill:var(--sun);stroke:var(--sun)}
+.wave .hit{cursor:pointer}
+.help{color:var(--muted)}
+.ej{color:var(--muted);font-style:italic;font-size:.95rem}
+.ola{background:var(--sea-soft);border-radius:14px;padding:12px 14px;font-size:.95rem;margin:10px 0}
+
+/* Formularios */
+.fields{display:grid;gap:10px;margin:16px 0}
+.row{display:flex;gap:8px;align-items:flex-start}
+.row .cols{flex:1;display:grid;gap:6px}
+input[type=text],input[type=tel]{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;min-height:50px}
+input::placeholder{color:var(--muted);opacity:.8}
+.rm{flex:none;width:44px;height:50px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--muted);font-size:1.4rem;line-height:1}
+.add{justify-self:start;background:none;border:none;color:var(--sea);font-weight:700;padding:8px 0;min-height:44px}
+.group-title{font-family:var(--head);font-size:1.1rem;margin:18px 0 4px}
+.nav{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-top:22px}
+
+/* Listas para marcar */
+.checks{display:grid;gap:10px;margin:16px 0}
+.item{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:14px}
+.item input[type=checkbox]{flex:none;width:26px;height:26px;margin:1px 0 0;accent-color:var(--sea)}
+.item.on{border-color:var(--sea);background:var(--sea-soft)}
+.item .txt{flex:1;min-width:0}
+.item .name{font-weight:700;overflow-wrap:anywhere}
+.item .sub{color:var(--muted);font-size:.92rem}
+.item .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.item.locked{border-style:dashed}
+.empty{background:var(--surface);border:1.5px dashed var(--line);border-radius:14px;padding:16px;color:var(--muted)}
+
+.notify{margin-top:22px;padding-top:18px;border-top:1.5px solid var(--line)}
+.notify .small{color:var(--muted);margin-top:8px}
+.next{margin-top:18px}
+
+/* Botón fijo de ayuda */
+.sticky{position:fixed;left:0;right:0;bottom:0;padding:10px 18px calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--bg) 70%,transparent)}
+.sticky .duo{max-width:524px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sticky .btn{min-height:50px;padding:8px 10px;font-size:.95rem}
+
+.toast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:700;font-size:.95rem;z-index:10}
+.warn{background:var(--alert-soft);border-radius:12px;padding:10px 14px;font-size:.92rem;margin-top:12px}
+@media (prefers-reduced-motion: no-preference){
+  .toast{animation:fade 2.6s ease forwards}
+  @keyframes fade{0%{opacity:0}10%{opacity:1}80%{opacity:1}100%{opacity:0}}
+}
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+/* ============ Configuración ============ */
+const TERAPEUTA_WA = '51984797931';
+const KEY = 'planSeguridad_v1';
+
+const STEPS = [
+  { key:'senales', type:'list', title:'Mis señales de alerta',
+    help:'Pensamientos, emociones, sensaciones del cuerpo, conductas o situaciones que me avisan que una crisis se acerca.',
+    ej:'Ej.: pensar "no aguanto más", no poder dormir, encerrarme en mi cuarto.',
+    ph:'Escribe una señal', add:'Añadir otra señal',
+    useQ:'¿Cuáles de estas señales notas ahora? Márcalas.', usedLabel:'Señales que noto' },
+  { key:'habilidades', type:'list', title:'Lo que puedo hacer por mi cuenta',
+    help:'Cosas que ya probé y me ayudan a atravesar el malestar sin ayuda de nadie.',
+    ej:'Ej.: agua fría en la cara, caminar rápido 20 minutos, escuchar mi playlist.',
+    ph:'Escribe algo que te ayuda', add:'Añadir otra',
+    useQ:'Elige una y hazla ahora. Marca las que vas usando.', usedLabel:'Lo que usé' },
+  { key:'distraccion', type:'contacts', title:'Personas y lugares que me distraen',
+    help:'Para cambiar de ambiente sin tener que hablar de lo que me pasa.',
+    ej:'Ej.: mi prima Ana, la cancha del barrio, la casa de mi abuela.',
+    ph:'Persona o lugar', add:'Añadir otra persona o lugar', phoneOptional:true,
+    useQ:'Busca compañía o cambia de lugar. Marca lo que hiciste.', usedLabel:'Busqué a' },
+  { key:'apoyo', type:'contacts', title:'Personas a las que puedo pedir ayuda',
+    help:'Personas de confianza a quienes sí puedo decirles que estoy mal. Escríbelas en el orden en que las contactarás.',
+    ej:'Ej.: mamá, mi tío Luis, mi tutora.',
+    ph:'Nombre', add:'Añadir otra persona',
+    useQ:'Contacta a alguien y dile que necesitas ayuda. Marca a quién contactaste.', usedLabel:'Contacté a' },
+  { key:'razones', type:'list', title:'Mis razones para vivir',
+    help:'Personas, metas, valores o cosas que hacen que mi vida valga la pena, incluso cuando duele mucho. Con mis propias palabras.',
+    ej:'Ej.: mi hermanito, terminar el colegio, mi perro Toby.',
+    ph:'Escribe una razón', add:'Añadir otra razón',
+    useQ:'Lee tus razones despacio. Marca las que hoy sientes más cerca.', usedLabel:'Razones que tengo presentes' },
+  { key:'servicios', type:'services', title:'Profesionales y líneas de ayuda',
+    help:'A quién acudir si los pasos anteriores no bastan. Las líneas de Perú ya vienen incluidas.',
+    ej:'Puedes añadir tu centro de salud, tu psiquiatra o el hospital más cercano.',
+    ph:'Nombre', add:'Añadir otro servicio',
+    useQ:'Si lo anterior no bastó, contacta a un profesional. Marca a quién contactaste.', usedLabel:'Contacté a' },
+  { key:'entorno', type:'env', title:'Hacer mi entorno más seguro',
+    help:'Qué alejo de mi alcance durante la crisis y quién me lo guarda. Es algo temporal y lo acordamos juntos.',
+    ej:'Ej.: los medicamentos de casa, los guarda mi papá.',
+    add:'Añadir otro acuerdo',
+    useQ:'Aleja lo que acordaste o pide a quien lo guarda que lo haga. Marca lo que hiciste.', usedLabel:'Alejé' }
+];
+
+const SERVICES = [
+  { id:'113', nombre:'Línea 113, opción 5 (MINSA)', sub:'Psicólogos las 24 horas. Gratis. Cuando contesten, marca la opción 5.',
+    href:'tel:113', btn:'Llamar al 113', cls:'' },
+  { id:'vozamiga', nombre:'La Voz Amiga', sub:'Línea de escucha para personas que están pasando un momento difícil.',
+    href:'tel:080041212', btn:'Llamar al 0800 4 1212', cls:'' },
+  { id:'aquiestoy', nombre:'Aquí Estoy Chat', sub:'Chat de apoyo para jóvenes. Puedes escribir en lugar de llamar.',
+    href:'https://aquiestoy.chat/', btn:'Abrir el chat', cls:'', web:true },
+  { id:'106', nombre:'SAMU 106', sub:'Emergencias. Si tu vida corre peligro ahora mismo.',
+    href:'tel:106', btn:'Llamar al 106', cls:'alert' }
+];
+const TERAPEUTA = { id:'terapeuta', nombre:'Mi psicóloga',
+  sub:'Te responderé lo antes posible, pero puedo estar ocupada. Si no respondo pronto, usa las líneas de arriba.' };
+
+/* ============ Guardado ============ */
+let memoria = null, guardadoOK = true;
+function cargar(){
+  try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : memoria; }
+  catch(e){ guardadoOK = false; return memoria; }
+}
+function guardar(p){
+  p.updated = new Date().toISOString();
+  memoria = p;
+  try { localStorage.setItem(KEY, JSON.stringify(p)); }
+  catch(e){ guardadoOK = false; }
+}
+
+function planVacio(){
+  const sel = {}; SERVICES.forEach(s => sel[s.id] = true);
+  return { senales:[''], habilidades:[''], distraccion:[{nombre:'',tel:''}], apoyo:[{nombre:'',tel:''}],
+    servicios:{ sel, propios:[] }, entorno:[{que:'',quien:''}], razones:[''] };
+}
+function limpiar(p){
+  const c = JSON.parse(JSON.stringify(p));
+  ['senales','habilidades','razones'].forEach(k => c[k] = c[k].map(s => s.trim()).filter(Boolean));
+  ['distraccion','apoyo'].forEach(k => c[k] = c[k].filter(x => x.nombre.trim()));
+  c.servicios.propios = c.servicios.propios.filter(x => x.nombre.trim());
+  c.entorno = c.entorno.filter(x => x.que.trim());
+  return c;
+}
+function paraEditar(p){
+  const c = JSON.parse(JSON.stringify(p));
+  ['senales','habilidades','razones'].forEach(k => { if(!c[k].length) c[k].push(''); });
+  ['distraccion','apoyo'].forEach(k => { if(!c[k].length) c[k].push({nombre:'',tel:''}); });
+  if(!c.entorno.length) c.entorno.push({que:'',quien:''});
+  SERVICES.forEach(s => { if(!(s.id in c.servicios.sel)) c.servicios.sel[s.id] = true; });
+  return c;
+}
+
+/* ============ Utilidades ============ */
+const app = document.getElementById('app');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const telHref = t => 'tel:' + String(t).replace(/[^\d+]/g,'');
+function waNum(t){
+  let d = String(t).replace(/\D/g,'');
+  if(d.length === 9 && d[0] === '9') d = '51' + d;
+  return d;
+}
+const waLink = (num, msg) => 'https://wa.me/' + num + (msg ? '?text=' + encodeURIComponent(msg) : '');
+function toast(msg){
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; t.setAttribute('role','status');
+  document.body.appendChild(t); setTimeout(() => t.remove(), 2700);
+}
+function fecha(iso){
+  try { return new Date(iso).toLocaleDateString('es-PE', { day:'numeric', month:'long', year:'numeric' }); }
+  catch(e){ return ''; }
+}
+
+/* Ola de progreso: 7 puntos sobre una línea ondulada */
+function ola(actual, clic){
+  const W = 320, H = 44, x0 = 16, x1 = W - 16, n = STEPS.length;
+  const y = x => H/2 - 10 * Math.sin(((x - x0) / (x1 - x0)) * Math.PI * 3);
+  let track = '', done = '';
+  const xa = x0 + (x1 - x0) * actual / (n - 1);
+  for(let x = x0; x <= x1; x += 4){
+    track += (x === x0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y(x).toFixed(1) + ' ';
+    if(x <= xa) done += (x === x0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y(x).toFixed(1) + ' ';
+  }
+  let dots = '';
+  for(let i = 0; i < n; i++){
+    const cx = x0 + (x1 - x0) * i / (n - 1);
+    const cls = i < actual ? 'past' : (i === actual ? 'now' : '');
+    const extra = clic ? ` class="${cls} hit" data-go="${i}" tabindex="0" role="button" aria-label="Ir al paso ${i+1}: ${esc(STEPS[i].title)}"` : ` class="${cls}"`;
+    dots += `<circle cx="${cx.toFixed(1)}" cy="${y(cx).toFixed(1)}" r="${i === actual ? 8 : 6}"${extra}></circle>`;
+  }
+  return `<svg class="wave" viewBox="0 0 ${W} ${H}" aria-hidden="${clic ? 'false' : 'true'}"><path class="track" d="${track}"/><path class="done" d="${done}"/>${dots}</svg>`;
+}
+
+/* ============ Estado ============ */
+let S = { view:'home', step:0, draft:null, mode:null, checks:{} };
+
+function render(){
+  if(S.view === 'home') vistaInicio();
+  else if(S.view === 'edit') vistaEditar();
+  else if(S.view === 'use') vistaUsar();
+  else if(S.view === 'safe') vistaASalvo();
+  window.scrollTo(0, 0);
+}
+
+/* ============ Inicio ============ */
+function vistaInicio(){
+  const plan = cargar();
+  app.innerHTML = `
+    <section class="hero">
+      <h1>Mi plan de seguridad</h1>
+      <p>Para atravesar una crisis paso a paso, hasta que pase.</p>
+    </section>
+
+    <section class="sos-card" aria-label="Ayuda inmediata">
+      <p><strong>¿Necesitas hablar con alguien ahora?</strong></p>
+      <a class="btn alert-line" href="tel:113">Llamar al 113</a>
+      <p class="small">Cuando contesten, marca la <strong>opción 5</strong>. Psicólogos gratis, las 24 horas.</p>
+      <hr class="sep">
+      <p><strong>¿Tu vida corre peligro ahora mismo?</strong></p>
+      <a class="btn alert" href="tel:106">Emergencia: llamar al 106</a>
+      <p class="small">SAMU, emergencias médicas las 24 horas. También puedes ir a la emergencia del hospital más cercano.</p>
+    </section>
+
+    <div class="stack">
+      ${plan ? `<button class="btn primary" data-act="usar">Usar mi plan</button>` : ''}
+      <button class="btn ${plan ? 'quiet' : 'primary'}" data-act="crear">Crear mi plan</button>
+      <button class="btn quiet" data-act="actualizar" ${plan ? '' : 'disabled'}>Actualizar mi plan</button>
+      ${!plan ? `<button class="btn quiet" disabled>Usar mi plan</button>
+      <p class="small muted saved">Crea tu plan primero, junto con tu psicóloga.</p>` : `
+      <p class="small muted saved">Última versión guardada: ${esc(fecha(plan.updated))}</p>`}
+    </div>
+    ${!guardadoOK ? `<p class="warn">Este navegador no permite guardar datos. Tu plan se perderá al cerrar la página. Ábrela en Chrome o Safari normal (no en modo incógnito).</p>` : ''}
+    <p class="foot small muted">Tu plan se guarda solo en este celular.</p>`;
+}
+
+/* ============ Crear / actualizar ============ */
+function iniciarEdicion(modo){
+  const plan = cargar();
+  if(modo === 'crear' && plan && !confirm('Ya tienes un plan guardado. Si creas uno nuevo, reemplazará al anterior. ¿Quieres continuar?')) return;
+  S.mode = modo;
+  S.draft = modo === 'crear' ? planVacio() : paraEditar(plan);
+  S.step = 0; S.view = 'edit'; render();
+}
+
+function campos(st){
+  const d = S.draft;
+  if(st.type === 'list'){
+    return d[st.key].map((v, i) => `
+      <div class="row">
+        <input type="text" value="${esc(v)}" placeholder="${esc(st.ph)}" data-f="${st.key}" data-i="${i}" aria-label="${esc(st.ph)} ${i+1}">
+        <button class="rm" data-act="rm" data-f="${st.key}" data-i="${i}" aria-label="Quitar">×</button>
+      </div>`).join('') + `<button class="add" data-act="add" data-f="${st.key}">+ ${esc(st.add)}</button>`;
+  }
+  if(st.type === 'contacts'){
+    return d[st.key].map((c, i) => `
+      <div class="row">
+        <div class="cols">
+          <input type="text" value="${esc(c.nombre)}" placeholder="${esc(st.ph)}" data-f="${st.key}" data-i="${i}" data-sub="nombre" aria-label="${esc(st.ph)} ${i+1}">
+          <input type="tel" inputmode="tel" value="${esc(c.tel)}" placeholder="Celular${st.phoneOptional ? ' (opcional)' : ''}" data-f="${st.key}" data-i="${i}" data-sub="tel" aria-label="Celular ${i+1}">
+        </div>
+        <button class="rm" data-act="rm" data-f="${st.key}" data-i="${i}" aria-label="Quitar">×</button>
+      </div>`).join('') + `<button class="add" data-act="add" data-f="${st.key}">+ ${esc(st.add)}</button>`;
+  }
+  if(st.type === 'env'){
+    return d.entorno.map((c, i) => `
+      <div class="row">
+        <div class="cols">
+          <input type="text" value="${esc(c.que)}" placeholder="Qué alejo de mi alcance" data-f="entorno" data-i="${i}" data-sub="que" aria-label="Qué alejo ${i+1}">
+          <input type="text" value="${esc(c.quien)}" placeholder="Quién lo guarda" data-f="entorno" data-i="${i}" data-sub="quien" aria-label="Quién lo guarda ${i+1}">
+        </div>
+        <button class="rm" data-act="rm" data-f="entorno" data-i="${i}" aria-label="Quitar">×</button>
+      </div>`).join('') + `<button class="add" data-act="add" data-f="entorno">+ ${esc(st.add)}</button>`;
+  }
+  if(st.type === 'services'){
+    const sel = d.servicios.sel;
+    const base = SERVICES.map(s => `
+      <label class="item ${sel[s.id] ? 'on' : ''}">
+        <input type="checkbox" data-svc="${s.id}" ${sel[s.id] ? 'checked' : ''}>
+        <span class="txt"><span class="name">${esc(s.nombre)}</span><br><span class="sub">${esc(s.sub)}</span></span>
+      </label>`).join('');
+    const propios = d.servicios.propios.map((c, i) => `
+      <div class="row">
+        <div class="cols">
+          <input type="text" value="${esc(c.nombre)}" placeholder="Nombre (ej.: Centro de salud mental)" data-f="propios" data-i="${i}" data-sub="nombre" aria-label="Servicio ${i+1}">
+          <input type="tel" inputmode="tel" value="${esc(c.tel)}" placeholder="Teléfono" data-f="propios" data-i="${i}" data-sub="tel" aria-label="Teléfono ${i+1}">
+        </div>
+        <button class="rm" data-act="rm" data-f="propios" data-i="${i}" aria-label="Quitar">×</button>
+      </div>`).join('');
+    return `<div class="checks" style="margin:0">${base}</div>
+      <p class="group-title">Otros que quiero añadir</p>
+      ${propios}<button class="add" data-act="add" data-f="propios">+ ${esc(st.add)}</button>
+      <p class="group-title">Siempre incluido</p>
+      <div class="item locked"><input type="checkbox" checked disabled aria-label="Mi psicóloga, siempre incluida">
+        <span class="txt"><span class="name">${esc(TERAPEUTA.nombre)}</span><br><span class="sub">WhatsApp. ${esc(TERAPEUTA.sub)}</span></span></div>`;
+  }
+}
+
+function vistaEditar(){
+  const st = STEPS[S.step], last = S.step === STEPS.length - 1;
+  app.innerHTML = `
+    <div class="bar"><button data-act="salir">Salir</button>
+      <span class="small muted">${S.mode === 'crear' ? 'Crear plan' : 'Actualizar plan'} · Paso ${S.step+1} de ${STEPS.length}</span></div>
+    ${ola(S.step, true)}
+    <h2>${esc(st.title)}</h2>
+    <p class="help">${esc(st.help)}</p>
+    <p class="ej">${esc(st.ej)}</p>
+    <div class="fields">${campos(st)}</div>
+    <div class="nav">
+      <button class="btn quiet" data-act="prev" ${S.step === 0 ? 'disabled' : ''}>Anterior</button>
+      ${last ? `<button class="btn primary" data-act="guardar">Guardar mi plan</button>`
+             : `<button class="btn primary" data-act="next">Siguiente</button>`}
+    </div>
+    ${S.mode === 'actualizar' && !last ? `<button class="btn quiet" style="margin-top:10px" data-act="guardar">Guardar cambios</button>` : ''}`;
+}
+
+function arr(f){ return f === 'propios' ? S.draft.servicios.propios : S.draft[f]; }
+function filaVacia(f){
+  if(f === 'entorno') return {que:'',quien:''};
+  if(['distraccion','apoyo','propios'].includes(f)) return {nombre:'',tel:''};
+  return '';
+}
+
+/* ============ Usar el plan ============ */
+function itemsUso(st){
+  const p = cargar();
+  if(st.type === 'list') return p[st.key].map((t, i) => ({ id:String(i), name:t }));
+  if(st.type === 'contacts') return p[st.key].map((c, i) => ({ id:String(i), name:c.nombre, tel:c.tel }));
+  if(st.type === 'env') return p.entorno.map((c, i) => ({ id:String(i), name:c.que, sub:c.quien ? 'Lo guarda: ' + c.quien : '' }));
+  if(st.type === 'services'){
+    const out = SERVICES.filter(s => p.servicios.sel[s.id]).map(s => ({ id:s.id, name:s.nombre, sub:s.sub, svc:s }));
+    p.servicios.propios.forEach((c, i) => out.push({ id:'p'+i, name:c.nombre, tel:c.tel, noWa:true }));
+    out.push({ id:'terapeuta', name:TERAPEUTA.nombre, sub:TERAPEUTA.sub, ter:true });
+    return out;
+  }
+}
+
+function mensaje(stepIdx){
+  const st = STEPS[stepIdx];
+  const marcados = itemsUso(st).filter(it => S.checks[st.key]?.has(it.id)).map(it => it.name);
+  let m = `Hola, estoy usando mi plan de seguridad.\nPaso ${stepIdx+1} de ${STEPS.length}: ${st.title}.`;
+  if(marcados.length) m += `\n${st.usedLabel}: ${marcados.join(', ')}.`;
+  return m;
+}
+
+function vistaUsar(){
+  const st = STEPS[S.step], items = itemsUso(st), last = S.step === STEPS.length - 1;
+  const set = S.checks[st.key] || new Set();
+  const lista = items.length ? items.map(it => {
+    let acts = '';
+    if(it.svc) acts = `<a class="mini ${it.svc.cls}" href="${it.svc.href}" ${it.svc.web ? 'target="_blank" rel="noopener"' : ''}>${esc(it.svc.btn)}</a>`;
+    else if(it.ter) acts = `<a class="mini wa" href="${waLink(TERAPEUTA_WA, 'Hola, necesito ayuda. Estoy usando mi plan de seguridad.')}" target="_blank" rel="noopener">Escribir por WhatsApp</a>`;
+    else if(it.tel) acts = `<a class="mini" href="${telHref(it.tel)}" aria-label="Llamar al ${esc(it.tel)}">📞 ${esc(it.tel)}</a>` +
+      (it.noWa ? '' : ` <a class="mini wa" href="${waLink(waNum(it.tel))}" target="_blank" rel="noopener">WhatsApp</a>`);
+    return `<div class="item ${set.has(it.id) ? 'on' : ''}">
+      <input type="checkbox" id="c_${it.id}" data-chk="${it.id}" ${set.has(it.id) ? 'checked' : ''}>
+      <div class="txt"><label for="c_${it.id}"><span class="name">${esc(it.name)}</span>${it.sub ? `<br><span class="sub">${esc(it.sub)}</span>` : ''}</label>
+      ${acts ? `<div class="acts">${acts}</div>` : ''}</div></div>`;
+  }).join('') : `<div class="empty">Este paso está vacío. Puedes completarlo con tu psicóloga en "Actualizar mi plan". Por ahora, pasa al siguiente paso.</div>`;
+
+  app.innerHTML = `
+    <div class="bar"><button data-act="inicio">Inicio</button><span class="small muted">Paso ${S.step+1} de ${STEPS.length}</span></div>
+    ${ola(S.step, false)}
+    ${S.step === 0 ? `<p class="ola">Una crisis es como una ola: sube, llega a lo más alto y luego baja sola. Tu tarea ahora es mantenerte a salvo mientras pasa.</p>` : ''}
+    <h2>${esc(st.title)}</h2>
+    <p class="help">${esc(st.useQ)}</p>
+    <div class="checks">${lista}</div>
+
+    <div class="notify">
+      <a class="btn wa" id="notify" href="${waLink(TERAPEUTA_WA, mensaje(S.step))}" target="_blank" rel="noopener">Avisar a mi psicóloga que uso este paso</a>
+      <p class="small">Te responderé lo antes posible, pero puedo estar ocupada. Si no respondo pronto, sigue con tu plan.</p>
+    </div>
+
+    <div class="stack next">
+      ${!last ? `<button class="btn primary" data-act="unext">Pasar al paso ${S.step+2}: ${esc(STEPS[S.step+1].title)}</button>` : ''}
+      ${S.step > 0 ? `<button class="btn quiet" data-act="uprev">Volver al paso ${S.step}</button>` : ''}
+      <button class="btn quiet" data-act="asalvo">Ya me siento más a salvo</button>
+    </div>
+    <div class="sticky"><div class="duo"><a class="btn alert-line" href="tel:113">113, opción 5</a><a class="btn alert" href="tel:106">Emergencia 106</a></div></div>`;
+}
+
+function vistaASalvo(){
+  const st = STEPS[S.step];
+  const m = `Hola, usé mi plan de seguridad hasta el paso ${S.step+1} (${st.title}) y ahora me siento más a salvo.`;
+  app.innerHTML = `
+    <section class="hero">
+      <h1>Bien hecho</h1>
+      <p>Usar tu plan en un momento difícil es algo valioso. Si el malestar vuelve, puedes empezar de nuevo desde el paso 1.</p>
+    </section>
+    <div class="stack">
+      <a class="btn wa" href="${waLink(TERAPEUTA_WA, m)}" target="_blank" rel="noopener">Avisar a mi psicóloga que ya estoy mejor</a>
+      <button class="btn primary" data-act="usar">Volver a empezar mi plan</button>
+      <button class="btn quiet" data-act="inicio">Ir al inicio</button>
+    </div>`;
+}
+
+/* ============ Eventos ============ */
+app.addEventListener('input', e => {
+  const t = e.target;
+  if(S.view !== 'edit' || !t.dataset.f) return;
+  const a = arr(t.dataset.f), i = +t.dataset.i;
+  if(t.dataset.sub) a[i][t.dataset.sub] = t.value; else a[i] = t.value;
+});
+
+app.addEventListener('change', e => {
+  const t = e.target;
+  if(t.dataset.svc){
+    S.draft.servicios.sel[t.dataset.svc] = t.checked;
+    t.closest('.item').classList.toggle('on', t.checked);
+  }
+  if(t.dataset.chk){
+    const k = STEPS[S.step].key;
+    S.checks[k] = S.checks[k] || new Set();
+    t.checked ? S.checks[k].add(t.dataset.chk) : S.checks[k].delete(t.dataset.chk);
+    t.closest('.item').classList.toggle('on', t.checked);
+    document.getElementById('notify').href = waLink(TERAPEUTA_WA, mensaje(S.step));
+  }
+});
+
+function irA(i){ S.step = i; render(); }
+app.addEventListener('keydown', e => {
+  if((e.key === 'Enter' || e.key === ' ') && e.target.dataset && e.target.dataset.go !== undefined){ e.preventDefault(); irA(+e.target.dataset.go); }
+});
+
+app.addEventListener('click', e => {
+  const go = e.target.closest('[data-go]');
+  if(go){ irA(+go.dataset.go); return; }
+  const b = e.target.closest('[data-act]');
+  if(!b) return;
+  const act = b.dataset.act;
+  switch(act){
+    case 'crear': iniciarEdicion('crear'); break;
+    case 'actualizar': iniciarEdicion('actualizar'); break;
+    case 'usar': S.checks = {}; S.step = 0; S.view = 'use'; render(); break;
+    case 'inicio': S.view = 'home'; render(); break;
+    case 'salir':
+      if(confirm('¿Salir sin guardar? Los cambios de esta vez se perderán.')){ S.view = 'home'; render(); }
+      break;
+    case 'prev': if(S.step > 0) irA(S.step - 1); break;
+    case 'next': irA(S.step + 1); break;
+    case 'add': {
+      arr(b.dataset.f).push(filaVacia(b.dataset.f)); render();
+      const inputs = app.querySelectorAll(`[data-f="${b.dataset.f}"]`);
+      const lastInput = [...inputs].filter(x => x.tagName === 'INPUT' && x.dataset.sub !== 'tel' && x.dataset.sub !== 'quien').pop();
+      lastInput && lastInput.focus();
+      window.scrollTo(0, document.body.scrollHeight);
+      break;
+    }
+    case 'rm': {
+      const a = arr(b.dataset.f); a.splice(+b.dataset.i, 1);
+      if(!a.length && b.dataset.f !== 'propios') a.push(filaVacia(b.dataset.f));
+      const y = window.scrollY; render(); window.scrollTo(0, y);
+      break;
+    }
+    case 'guardar':
+      guardar(limpiar(S.draft));
+      S.view = 'home'; render();
+      toast(S.mode === 'crear' ? 'Plan guardado' : 'Cambios guardados');
+      break;
+    case 'unext': irA(S.step + 1); break;
+    case 'uprev': irA(S.step - 1); break;
+    case 'asalvo': S.view = 'safe'; render(); break;
+  }
+});
+
+render();
+</script>
+</body>
+</html>
