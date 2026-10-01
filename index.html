@@ -87,6 +87,8 @@ input::placeholder{color:var(--muted);opacity:.8}
 .seg{display:inline-flex;border:1.5px solid var(--line);border-radius:999px;padding:3px;gap:3px;justify-self:start}
 .seg button{font:inherit;font-size:.92rem;font-weight:700;border:none;background:transparent;color:var(--muted);padding:6px 14px;border-radius:999px;min-height:36px}
 .seg button.on{background:var(--sea);color:var(--surface)}
+.links{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 22px;margin-top:18px}
+.linkbtn{font:inherit;font-size:.95rem;background:none;border:none;color:var(--sea);font-weight:700;text-decoration:underline;text-underline-offset:3px;min-height:44px;padding:4px}
 .group-title{font-family:var(--head);font-size:1.1rem;margin:18px 0 4px}
 .nav{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-top:22px}
 
@@ -184,8 +186,8 @@ function cargar(){
   try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : memoria; }
   catch(e){ guardadoOK = false; return memoria; }
 }
-function guardar(p){
-  p.updated = new Date().toISOString();
+function guardar(p, conservarFecha){
+  if(!conservarFecha || !p.updated) p.updated = new Date().toISOString();
   memoria = p;
   try { localStorage.setItem(KEY, JSON.stringify(p)); }
   catch(e){ guardadoOK = false; }
@@ -262,6 +264,7 @@ function render(){
   else if(S.view === 'edit') vistaEditar();
   else if(S.view === 'use') vistaUsar();
   else if(S.view === 'safe') vistaASalvo();
+  else if(S.view === 'saved') vistaGuardado();
   window.scrollTo(0, 0);
 }
 
@@ -293,6 +296,11 @@ function vistaInicio(){
       <p class="small muted saved">Última versión guardada: ${esc(fecha(plan.updated))}</p>`}
     </div>
     ${!guardadoOK ? `<p class="warn">Este navegador no permite guardar datos. Tu plan se perderá al cerrar la página. Ábrela en Chrome o Safari normal (no en modo incógnito).</p>` : ''}
+    <div class="links">
+      ${plan ? `<button class="linkbtn" data-act="copia">Guardar una copia</button>` : ''}
+      <button class="linkbtn" data-act="restaurar">Restaurar una copia</button>
+    </div>
+    <input type="file" id="fileRestore" accept=".html,.htm,.json,text/html,application/json" hidden>
     <p class="foot small muted">Tu plan se guarda solo en este celular.</p>`;
 }
 
@@ -466,6 +474,100 @@ function vistaASalvo(){
     </div>`;
 }
 
+
+/* ============ Copia de seguridad ============ */
+function vistaGuardado(){
+  app.innerHTML = `
+    <section class="hero">
+      <h1>${S.mode === 'crear' ? 'Plan guardado' : 'Cambios guardados'}</h1>
+      <p>Tu plan ya está en este celular. Guarda también una copia, por si cambias de celular o se borran los datos del navegador.</p>
+    </section>
+    <div class="stack">
+      <button class="btn primary" data-act="copia">Guardar una copia en mi celular</button>
+      <button class="btn quiet" data-act="inicio">Ir al inicio</button>
+    </div>
+    <p class="small muted" style="margin-top:16px">La copia se guarda en tu carpeta de Descargas. Puedes abrirla para leer tu plan aunque no tengas la app a mano. Para recuperarlo, entra a la app y toca "Restaurar una copia".</p>`;
+}
+
+function lineasServicio(id){
+  return { '113':'Línea 113, opción 5 (MINSA): llamar al 113 y marcar 5',
+    'vozamiga':'La Voz Amiga: 0800 4 1212', 'aquiestoy':'Aquí Estoy Chat: aquiestoy.chat',
+    '106':'SAMU, emergencias: 106' }[id];
+}
+
+function htmlCopia(p){
+  const e = esc, li = arr => arr.length ? '<ul>' + arr.map(x => '<li>' + x + '</li>').join('') + '</ul>' : '<p class="v">(vacío)</p>';
+  const secc = STEPS.map((st, i) => {
+    let items = [];
+    if(st.type === 'list') items = p[st.key].map(e);
+    if(st.type === 'contacts') items = p[st.key].map(c => e(c.nombre) + (c.tipo === 'lugar' ? ' (lugar)' : '') + (c.tel ? ' · ' + e(c.tel) : ''));
+    if(st.type === 'env') items = p.entorno.map(c => e(c.que) + (c.quien ? ' · lo guarda: ' + e(c.quien) : ''));
+    if(st.type === 'services'){
+      items = SERVICES.filter(s => p.servicios.sel[s.id]).map(s => e(lineasServicio(s.id)))
+        .concat(p.servicios.propios.map(c => e(c.nombre) + (c.tel ? ' · ' + e(c.tel) : '')))
+        .concat(['Mi psicóloga (WhatsApp): +51 984 797 931']);
+    }
+    return '<h2>' + (i+1) + '. ' + e(st.title) + '</h2>' + li(items);
+  }).join('');
+  const datos = JSON.stringify(p).replace(/</g, '\\u003c');
+  return '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
+    + '<title>Copia de mi plan de seguridad</title><style>body{font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:20px;line-height:1.5;color:#1D2A36}'
+    + 'h1{font-size:1.6rem;margin-bottom:0}h2{font-size:1.1rem;margin:22px 0 4px;color:#2B7471}ul{margin:0;padding-left:20px}.v{color:#777;margin:0}'
+    + '.box{background:#F7E2DE;border-radius:12px;padding:12px 14px;margin:16px 0}.nota{color:#55687A;font-size:.9rem;margin-top:28px}</style></head><body>'
+    + '<h1>Mi plan de seguridad</h1><p style="color:#55687A">Versión del ' + e(fecha(p.updated)) + '</p>'
+    + '<div class="box"><strong>Si tu vida corre peligro: 106.</strong><br>Para hablar con un psicólogo: 113, opción 5.</div>'
+    + secc
+    + '<p class="nota">Este archivo es una copia de tu plan. Para recuperarlo en la app, entra a "Mi plan de seguridad" y toca "Restaurar una copia". No borres este archivo.</p>'
+    + '<script type="application/json" id="plan-data">' + datos + '<\/script></body></html>';
+}
+
+function descargarCopia(){
+  const p = cargar();
+  if(!p){ toast('Primero crea tu plan'); return; }
+  const d = new Date(p.updated || Date.now());
+  const f = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  const blob = new Blob([htmlCopia(p)], { type:'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'mi-plan-de-seguridad-' + f + '.html';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  toast('Copia guardada en Descargas');
+}
+
+function normalizar(d){
+  const v = planVacio(), txt = a => Array.isArray(a) ? a.filter(x => typeof x === 'string') : [];
+  const cont = (a, conTipo) => Array.isArray(a) ? a.map(x => {
+    const o = { nombre:String(x?.nombre || ''), tel:String(x?.tel || '') };
+    if(conTipo) o.tipo = x?.tipo === 'lugar' ? 'lugar' : 'persona';
+    return o; }) : [];
+  return {
+    senales: txt(d.senales), habilidades: txt(d.habilidades), razones: txt(d.razones),
+    distraccion: cont(d.distraccion, true), apoyo: cont(d.apoyo),
+    entorno: Array.isArray(d.entorno) ? d.entorno.map(x => ({ que:String(x?.que || ''), quien:String(x?.quien || '') })) : [],
+    servicios: { sel: Object.assign(v.servicios.sel, d.servicios?.sel || {}), propios: cont(d.servicios?.propios) },
+    updated: typeof d.updated === 'string' ? d.updated : undefined
+  };
+}
+
+function restaurarCopia(file){
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const t = String(r.result);
+      const m = t.match(/<script type="application\/json" id="plan-data">([\s\S]*?)<\/script>/);
+      const d = JSON.parse(m ? m[1] : t);
+      if(!d || typeof d !== 'object' || !('senales' in d)) throw new Error('formato');
+      if(cargar() && !confirm('Ya tienes un plan en este celular. ¿Quieres reemplazarlo por la copia del ' + fecha(d.updated) + '?')) return;
+      guardar(limpiar(normalizar(d)), true);
+      S.view = 'home'; render(); toast('Plan restaurado');
+    } catch(err){
+      alert('Este archivo no parece una copia del plan. Elige el archivo que empieza con "mi-plan-de-seguridad".');
+    }
+  };
+  r.readAsText(file);
+}
+
 /* ============ Eventos ============ */
 app.addEventListener('input', e => {
   const t = e.target;
@@ -476,6 +578,7 @@ app.addEventListener('input', e => {
 
 app.addEventListener('change', e => {
   const t = e.target;
+  if(t.id === 'fileRestore'){ if(t.files[0]) restaurarCopia(t.files[0]); t.value = ''; return; }
   if(t.dataset.svc){
     S.draft.servicios.sel[t.dataset.svc] = t.checked;
     t.closest('.item').classList.toggle('on', t.checked);
@@ -527,9 +630,10 @@ app.addEventListener('click', e => {
     }
     case 'guardar':
       guardar(limpiar(S.draft));
-      S.view = 'home'; render();
-      toast(S.mode === 'crear' ? 'Plan guardado' : 'Cambios guardados');
+      S.view = 'saved'; render();
       break;
+    case 'copia': descargarCopia(); break;
+    case 'restaurar': document.getElementById('fileRestore').click(); break;
     case 'unext': irA(S.step + 1); break;
     case 'uprev': irA(S.step - 1); break;
     case 'asalvo': S.view = 'safe'; render(); break;
