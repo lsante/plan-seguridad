@@ -84,6 +84,9 @@ input[type=text],input[type=tel]{width:100%;font:inherit;color:var(--ink);backgr
 input::placeholder{color:var(--muted);opacity:.8}
 .rm{flex:none;width:44px;height:50px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--muted);font-size:1.4rem;line-height:1}
 .add{justify-self:start;background:none;border:none;color:var(--sea);font-weight:700;padding:8px 0;min-height:44px}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:999px;padding:3px;gap:3px;justify-self:start}
+.seg button{font:inherit;font-size:.92rem;font-weight:700;border:none;background:transparent;color:var(--muted);padding:6px 14px;border-radius:999px;min-height:36px}
+.seg button.on{background:var(--sea);color:var(--surface)}
 .group-title{font-family:var(--head);font-size:1.1rem;margin:18px 0 4px}
 .nav{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-top:22px}
 
@@ -138,12 +141,12 @@ const STEPS = [
   { key:'distraccion', type:'contacts', title:'Personas y lugares que me distraen',
     help:'Para cambiar de ambiente sin tener que hablar de lo que me pasa.',
     ej:'Ej.: mi prima Ana, la cancha del barrio, la casa de mi abuela.',
-    ph:'Persona o lugar', add:'Añadir otra persona o lugar', phoneOptional:true,
+    ph:'Persona o lugar', add:'Añadir otra persona o lugar', phoneOptional:true, waMsg:'Hola, ¿estás libre? ¿Hacemos algo juntos?',
     useQ:'Busca compañía o cambia de lugar. Marca lo que hiciste.', usedLabel:'Busqué a' },
   { key:'apoyo', type:'contacts', title:'Personas a las que puedo pedir ayuda',
     help:'Personas de confianza a quienes sí puedo decirles que estoy mal. Escríbelas en el orden en que las contactarás.',
     ej:'Ej.: mamá, mi tío Luis, mi tutora.',
-    ph:'Nombre', add:'Añadir otra persona',
+    ph:'Nombre', add:'Añadir otra persona', waMsg:'Hola, no me siento bien y necesito ayuda. ¿Puedes hablar conmigo?',
     useQ:'Contacta a alguien y dile que necesitas ayuda. Marca a quién contactaste.', usedLabel:'Contacté a' },
   { key:'razones', type:'list', title:'Mis razones para vivir',
     help:'Personas, metas, valores o cosas que hacen que mi vida valga la pena, incluso cuando duele mucho. Con mis propias palabras.',
@@ -190,13 +193,14 @@ function guardar(p){
 
 function planVacio(){
   const sel = {}; SERVICES.forEach(s => sel[s.id] = true);
-  return { senales:[''], habilidades:[''], distraccion:[{nombre:'',tel:''}], apoyo:[{nombre:'',tel:''}],
+  return { senales:[''], habilidades:[''], distraccion:[{nombre:'',tel:'',tipo:'persona'}], apoyo:[{nombre:'',tel:''}],
     servicios:{ sel, propios:[] }, entorno:[{que:'',quien:''}], razones:[''] };
 }
 function limpiar(p){
   const c = JSON.parse(JSON.stringify(p));
   ['senales','habilidades','razones'].forEach(k => c[k] = c[k].map(s => s.trim()).filter(Boolean));
   ['distraccion','apoyo'].forEach(k => c[k] = c[k].filter(x => x.nombre.trim()));
+  c.distraccion.forEach(x => { if(x.tipo === 'lugar') x.tel = ''; });
   c.servicios.propios = c.servicios.propios.filter(x => x.nombre.trim());
   c.entorno = c.entorno.filter(x => x.que.trim());
   return c;
@@ -205,6 +209,7 @@ function paraEditar(p){
   const c = JSON.parse(JSON.stringify(p));
   ['senales','habilidades','razones'].forEach(k => { if(!c[k].length) c[k].push(''); });
   ['distraccion','apoyo'].forEach(k => { if(!c[k].length) c[k].push({nombre:'',tel:''}); });
+  c.distraccion.forEach(x => { if(!x.tipo) x.tipo = 'persona'; });
   if(!c.entorno.length) c.entorno.push({que:'',quien:''});
   SERVICES.forEach(s => { if(!(s.id in c.servicios.sel)) c.servicios.sel[s.id] = true; });
   return c;
@@ -310,14 +315,23 @@ function campos(st){
       </div>`).join('') + `<button class="add" data-act="add" data-f="${st.key}">+ ${esc(st.add)}</button>`;
   }
   if(st.type === 'contacts'){
-    return d[st.key].map((c, i) => `
+    const esDist = st.key === 'distraccion';
+    return d[st.key].map((c, i) => {
+      const lugar = esDist && c.tipo === 'lugar';
+      const toggle = esDist ? `
+          <div class="seg" role="group" aria-label="Tipo">
+            <button type="button" class="${!lugar ? 'on' : ''}" data-act="tipo" data-v="persona" data-i="${i}" aria-pressed="${!lugar}">Persona</button>
+            <button type="button" class="${lugar ? 'on' : ''}" data-act="tipo" data-v="lugar" data-i="${i}" aria-pressed="${lugar}">Lugar</button>
+          </div>` : '';
+      const ph = esDist ? (lugar ? 'Nombre del lugar' : 'Nombre de la persona') : st.ph;
+      return `
       <div class="row">
-        <div class="cols">
-          <input type="text" value="${esc(c.nombre)}" placeholder="${esc(st.ph)}" data-f="${st.key}" data-i="${i}" data-sub="nombre" aria-label="${esc(st.ph)} ${i+1}">
-          <input type="tel" inputmode="tel" value="${esc(c.tel)}" placeholder="Celular${st.phoneOptional ? ' (opcional)' : ''}" data-f="${st.key}" data-i="${i}" data-sub="tel" aria-label="Celular ${i+1}">
+        <div class="cols">${toggle}
+          <input type="text" value="${esc(c.nombre)}" placeholder="${esc(ph)}" data-f="${st.key}" data-i="${i}" data-sub="nombre" aria-label="${esc(ph)} ${i+1}">
+          ${lugar ? '' : `<input type="tel" inputmode="tel" value="${esc(c.tel)}" placeholder="Celular${esDist ? ' (para llamarle o escribirle por WhatsApp)' : ''}" data-f="${st.key}" data-i="${i}" data-sub="tel" aria-label="Celular ${i+1}">`}
         </div>
         <button class="rm" data-act="rm" data-f="${st.key}" data-i="${i}" aria-label="Quitar">×</button>
-      </div>`).join('') + `<button class="add" data-act="add" data-f="${st.key}">+ ${esc(st.add)}</button>`;
+      </div>`;}).join('') + `<button class="add" data-act="add" data-f="${st.key}">+ ${esc(st.add)}</button>`;
   }
   if(st.type === 'env'){
     return d.entorno.map((c, i) => `
@@ -374,7 +388,8 @@ function vistaEditar(){
 function arr(f){ return f === 'propios' ? S.draft.servicios.propios : S.draft[f]; }
 function filaVacia(f){
   if(f === 'entorno') return {que:'',quien:''};
-  if(['distraccion','apoyo','propios'].includes(f)) return {nombre:'',tel:''};
+  if(f === 'distraccion') return {nombre:'',tel:'',tipo:'persona'};
+  if(['apoyo','propios'].includes(f)) return {nombre:'',tel:''};
   return '';
 }
 
@@ -382,7 +397,7 @@ function filaVacia(f){
 function itemsUso(st){
   const p = cargar();
   if(st.type === 'list') return p[st.key].map((t, i) => ({ id:String(i), name:t }));
-  if(st.type === 'contacts') return p[st.key].map((c, i) => ({ id:String(i), name:c.nombre, tel:c.tel }));
+  if(st.type === 'contacts') return p[st.key].map((c, i) => ({ id:String(i), name:c.nombre, tel: c.tipo === 'lugar' ? '' : c.tel, sub: c.tipo === 'lugar' ? 'Lugar' : '', waMsg: st.waMsg }));
   if(st.type === 'env') return p.entorno.map((c, i) => ({ id:String(i), name:c.que, sub:c.quien ? 'Lo guarda: ' + c.quien : '' }));
   if(st.type === 'services'){
     const out = SERVICES.filter(s => p.servicios.sel[s.id]).map(s => ({ id:s.id, name:s.nombre, sub:s.sub, svc:s }));
@@ -408,7 +423,7 @@ function vistaUsar(){
     if(it.svc) acts = `<a class="mini ${it.svc.cls}" href="${it.svc.href}" ${it.svc.web ? 'target="_blank" rel="noopener"' : ''}>${esc(it.svc.btn)}</a>`;
     else if(it.ter) acts = `<a class="mini wa" href="${waLink(TERAPEUTA_WA, 'Hola, necesito ayuda. Estoy usando mi plan de seguridad.')}" target="_blank" rel="noopener">Escribir por WhatsApp</a>`;
     else if(it.tel) acts = `<a class="mini" href="${telHref(it.tel)}" aria-label="Llamar al ${esc(it.tel)}">📞 ${esc(it.tel)}</a>` +
-      (it.noWa ? '' : ` <a class="mini wa" href="${waLink(waNum(it.tel))}" target="_blank" rel="noopener">WhatsApp</a>`);
+      (it.noWa ? '' : ` <a class="mini wa" href="${waLink(waNum(it.tel), it.waMsg)}" target="_blank" rel="noopener">WhatsApp</a>`);
     return `<div class="item ${set.has(it.id) ? 'on' : ''}">
       <input type="checkbox" id="c_${it.id}" data-chk="${it.id}" ${set.has(it.id) ? 'checked' : ''}>
       <div class="txt"><label for="c_${it.id}"><span class="name">${esc(it.name)}</span>${it.sub ? `<br><span class="sub">${esc(it.sub)}</span>` : ''}</label>
@@ -493,6 +508,7 @@ app.addEventListener('click', e => {
     case 'salir':
       if(confirm('¿Salir sin guardar? Los cambios de esta vez se perderán.')){ S.view = 'home'; render(); }
       break;
+    case 'tipo': S.draft.distraccion[+b.dataset.i].tipo = b.dataset.v; { const y = window.scrollY; render(); window.scrollTo(0, y); } break;
     case 'prev': if(S.step > 0) irA(S.step - 1); break;
     case 'next': irA(S.step + 1); break;
     case 'add': {
